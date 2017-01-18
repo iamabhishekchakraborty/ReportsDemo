@@ -1,3 +1,5 @@
+USE AdventureWorks2014;
+GO;
 -- alter the existing view - reason being we need the data in some specific format
 ALTER VIEW [dbo].[vDMPrep]
 AS

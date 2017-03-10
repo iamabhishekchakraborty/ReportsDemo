@@ -1,0 +1,28 @@
+DECLARE @JobrunDate DATE = GETDATE()
+DECLARE @CalTable TABLE(ID Int IDENTITY(1,1),Mon VARCHAR(10))
+INSERT INTO @CalTable (Mon) VALUES ('Jan'),('Feb'),('Mar'),('Apr'),('May'),('Jun'),('Jul'),('Aug'),('Sep'),('Oct'),('Nov'),('Dec')
+SELECT ServiceType,
+	   MAX(CASE WHEN PostMonth = 'Jan' AND PostYear = YEAR(@JobrunDate) THEN Charges END) AS Jan,
+	   MAX(CASE WHEN PostMonth = 'Feb' AND PostYear = YEAR(@JobrunDate) THEN Charges END) AS Feb,
+	   MAX(CASE WHEN PostMonth = 'Mar' AND PostYear = YEAR(@JobrunDate) THEN Charges END) AS Mar,
+	   MAX(CASE WHEN PostMonth = 'Apr' AND PostYear = YEAR(@JobrunDate) THEN Charges END) AS Apr,
+	   MAX(CASE WHEN PostMonth = 'May' AND PostYear = YEAR(@JobrunDate) THEN Charges END) AS May,
+	   MAX(CASE WHEN PostMonth = 'Jun' AND PostYear = YEAR(@JobrunDate) THEN Charges END) AS Jun,
+	   MAX(CASE WHEN PostMonth = 'Jul' AND PostYear = YEAR(@JobrunDate) THEN Charges END) AS Jul,
+	   MAX(CASE WHEN PostMonth = 'Aug' AND PostYear = YEAR(@JobrunDate) THEN Charges END) AS Aug,
+	   MAX(CASE WHEN PostMonth = 'Sep' AND PostYear = YEAR(@JobrunDate) THEN Charges END) AS Sep,
+	   MAX(CASE WHEN PostMonth = 'Oct' AND PostYear = YEAR(@JobrunDate) THEN Charges END) AS Oct,
+	   MAX(CASE WHEN PostMonth = 'Nov' AND PostYear = YEAR(@JobrunDate) THEN Charges END) AS Nov,
+	   MAX(CASE WHEN PostMonth = 'Dec' AND PostYear = YEAR(@JobrunDate) THEN Charges END) AS Dec,
+	   (
+		SELECT SUM(Charges) FROM [dbo].[SSRSREPORT] A
+		WHERE PostYear = YEAR(@JobrunDate) - 1 AND PostMonth IN (SELECT Mon FROM @CalTable WHERE ID < MONTH(@JobrunDate))
+		AND A.ServiceType = B.ServiceType
+	   ) AS "2016 YTD",
+	   (
+		SELECT SUM(Charges) FROM [dbo].[SSRSREPORT] A
+		WHERE PostYear = YEAR(@JobrunDate) - 1 
+		AND A.ServiceType = B.ServiceType
+	   ) AS "2016 Actual"
+FROM [dbo].[SSRSREPORT] B
+GROUP BY ServiceType
